@@ -32,7 +32,6 @@ JSON.map
 frontend/src/**/*.js
 /bom.json
 /bom.xml
-.env
 
 # IDEs
 .idea/
@@ -66,3 +65,6 @@ config/*.yml
 
 # System Files
 .DS_Store
+
+# Local environment variables
+.env
