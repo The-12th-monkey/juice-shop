@@ -10,6 +10,21 @@ import * as otplib from 'otplib'
 
 import * as security from '../../lib/insecurity'
 
+const TEST_USER_PASSWORD = process.env.TEST_USER_PASSWORD;
+if (!TEST_USER_PASSWORD) throw new Error('TEST_USER_PASSWORD environment variable is not set.');
+
+const TEST_USER_TOTP_SECRET = process.env.TEST_USER_TOTP_SECRET;
+if (!TEST_USER_TOTP_SECRET) throw new Error('TEST_USER_TOTP_SECRET environment variable is not set.');
+
+const TEST_USER_PASSWORD_2 = process.env.TEST_USER_PASSWORD_2;
+if (!TEST_USER_PASSWORD_2) throw new Error('TEST_USER_PASSWORD_2 environment variable is not set.');
+
+const TEST_USER_TOTP_SECRET_2 = process.env.TEST_USER_TOTP_SECRET_2;
+if (!TEST_USER_TOTP_SECRET_2) throw new Error('TEST_USER_TOTP_SECRET_2 environment variable is not set.');
+
+const TEST_TOKEN = process.env.TEST_TOKEN;
+if (!TEST_TOKEN) throw new Error('TEST_TOKEN environment variable is not set.');
+
 const Joi = frisby.Joi
 
 const REST_URL = 'http://localhost:3000/rest'
@@ -171,8 +186,8 @@ describe('/rest/2fa/status', () => {
   it('GET should indicate 2fa is setup for 2fa enabled users', async () => {
     const { token } = await login({
       email: `wurstbrot@${config.get<string>('application.domain')}`,
-      password: 'EinBelegtesBrotMitSchinkenSCHINKEN!',
-      totpSecret: 'IFTXE3SPOEYVURT2MRYGI52TKJ4HC3KH'
+      password: TEST_USER_PASSWORD,
+      totpSecret: TEST_USER_TOTP_SECRET
     })
 
     // @ts-expect-error FIXME promise return handling broken
@@ -233,9 +248,9 @@ describe('/rest/2fa/status', () => {
 describe('/rest/2fa/setup', () => {
   it('POST should be able to setup 2fa for accounts without 2fa enabled', async () => {
     const email = 'fooooo1@bar.com'
-    const password = '123456'
+    const password = TEST_USER_PASSWORD_2
 
-    const secret = 'ASDVAJSDUASZGDIADBJS'
+    const secret = TEST_USER_TOTP_SECRET_2
 
     await register({ email, password })
     const { token } = await login({ email, password })
