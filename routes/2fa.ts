@@ -72,15 +72,22 @@ export async function status (req: Request, res: Response) {
     if (user.totpSecret === '') {
       const secret = otplib.authenticator.generateSecret()
 
-      res.json({
+    // --- Початок виправлення ---
+
+    // 1. Створюємо URI, який очікують додатки-автентифікатори
+    const totpUri = otplib.authenticator.keyuri(user.email, config.get<string>('application.name'), secret)
+
+    res.json({
         setup: false,
-        secret,
+        // 2. Відправляємо 'totpUri' замість 'secret'
+        totpUri,
         email: user.email,
         setupToken: security.authorize({
-          secret,
-          type: 'totp_setup_secret'
+            secret, // Цей 'secret' потрібен для *внутрішнього* токена верифікації,
+                    // він не відправляється клієнту як окреме поле.
+            type: 'totp_setup_secret'
         })
-      })
+    })
     } else {
       res.json({
         setup: true
