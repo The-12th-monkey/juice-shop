@@ -31,7 +31,23 @@ export function login () {
 
   return (req: Request, res: Response, next: NextFunction) => {
     verifyPreLoginChallenges(req) // vuln-code-snippet hide-line
-    models.sequelize.query(`SELECT * FROM Users WHERE email = '${req.body.email || ''}' AND password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, { model: UserModel, plain: true }) // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
+  // --- Початок виправлення ---
+  // 1. Створюємо константи для значень, отриманих від користувача.
+  const email = req.body.email || ''
+  const passwordHash = security.hash(req.body.password || '')
+
+  // 2. Використовуємо параметризований запит.
+  // Замість ${req.body.email} ми використовуємо плейсхолдери $email та $passwordHash.
+  models.sequelize.query(
+      'SELECT * FROM Users WHERE email = $email AND password = $passwordHash AND deletedAt IS NULL',
+      {
+          // 3. Передаємо значення безпечно через об'єкт `bind`.
+          // Sequelize тепер сам екранує ці значення, запобігаючи ін'єкції.
+          bind: { email, passwordHash },
+          model: UserModel,
+          plain: true
+      }
+  ) // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
       .then((authenticatedUser) => { // vuln-code-snippet neutral-line loginAdminChallenge loginBenderChallenge loginJimChallenge
         const user = utils.queryResultToJson(authenticatedUser)
         if (user.data?.id && user.data.totpSecret !== '') {
