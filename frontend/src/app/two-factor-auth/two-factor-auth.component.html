@@ -13,6 +13,7 @@
         <div id="2fa-setup-successfully">
           <p translate>2FA_SUCCESSFUL_SETUP</p>
           <form
+            method="post"
             class="form-container"
             id="two-factor-auth-disable"
             [formGroup]="twoFactorDisableForm"
@@ -42,6 +43,7 @@
         </div>
       } @else {
         <form
+          method="post"
           class="form-container"
           id="two-factor-auth-setup"
           [formGroup]="twoFactorSetupForm"
